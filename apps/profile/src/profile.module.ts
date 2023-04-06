@@ -5,6 +5,8 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 
 import { DatabaseModule } from '@app/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Profile } from './entities/profile-entity';
 
 
 @Module({
@@ -21,7 +23,8 @@ import { DatabaseModule } from '@app/common';
         APP_PORT: Joi.number().required(),
       })
     }),
-    DatabaseModule,
+    DatabaseModule.forRoot([Profile]) ,
+    TypeOrmModule.forFeature([Profile])
   ],
   controllers: [ProfileController],
   providers: [ProfileService],
