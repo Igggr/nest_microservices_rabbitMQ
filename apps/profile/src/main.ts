@@ -9,10 +9,6 @@ import { OPTIONS } from '@app/common';
 async function bootstrap() {
   const app = await NestFactory.create(ProfileModule);
 
-  app.connectMicroservice<RmqOptions>(OPTIONS);
-
-  await app.startAllMicroservices();
-
   const config = new DocumentBuilder()
     .setTitle('Просто учебный проект')
     .setDescription('Rest API к проекту')
