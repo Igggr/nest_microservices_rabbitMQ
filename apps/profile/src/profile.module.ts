@@ -4,9 +4,10 @@ import { ProfileService } from './profile.service';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 
-import { DatabaseModule } from '@app/common';
+import { DatabaseModule, OPTIONS } from '@app/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Profile } from './entities/profile-entity';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 
 @Module({
@@ -24,7 +25,13 @@ import { Profile } from './entities/profile-entity';
       })
     }),
     DatabaseModule.forRoot([Profile]) ,
-    TypeOrmModule.forFeature([Profile])
+    TypeOrmModule.forFeature([Profile]),
+    ClientsModule.register([
+      {
+        name: 'AUTH_SERVICE',
+        ...OPTIONS,
+      },
+    ])
   ],
   controllers: [ProfileController],
   providers: [ProfileService],

@@ -2,10 +2,16 @@ import { NestFactory } from '@nestjs/core';
 import { ProfileModule } from './profile.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { MicroserviceOptions, RmqOptions, Transport } from '@nestjs/microservices';
+import { OPTIONS } from '@app/common';
 
 
 async function bootstrap() {
   const app = await NestFactory.create(ProfileModule);
+
+  app.connectMicroservice<RmqOptions>(OPTIONS);
+
+  await app.startAllMicroservices();
 
   const config = new DocumentBuilder()
     .setTitle('Просто учебный проект')

@@ -36,3 +36,5 @@ lerna-debug.log*
 
 # postgres
 db_data
+
+rabbitmq

@@ -25,7 +25,19 @@ services:
     - docker.env
     networks:
     - postgres
- 
+
+  rabbit:
+    image: rabbitmq:3.10.7-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - 15672:15672
+      - 5672:5672 # AMQP порт
+    environment:
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit disk_free_limit 2147483648
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+
 networks:
   postgres:
     driver: bridge

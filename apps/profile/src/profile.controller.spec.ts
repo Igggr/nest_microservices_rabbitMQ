@@ -14,9 +14,4 @@ describe('ProfileController', () => {
     profileController = app.get<ProfileController>(ProfileController);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(profileController.getHello()).toBe('Hello World!');
-    });
-  });
 });

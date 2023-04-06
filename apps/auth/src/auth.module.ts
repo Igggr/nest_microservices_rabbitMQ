@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { DatabaseModule } from '@app/common';
+import { DatabaseModule, OPTIONS } from '@app/common';
 import { User } from './entities/user-entity';
 import { Role } from './entities/role-entity';
 import { UserRole } from './entities/user-roie-entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [
@@ -24,8 +25,13 @@ import * as Joi from 'joi';
       })
     }),
     DatabaseModule.forRoot([User, UserRole, Role]),
-    TypeOrmModule.forFeature([User, UserRole, Role])
-
+    TypeOrmModule.forFeature([User, UserRole, Role]),
+    ClientsModule.register([
+      {
+        name: 'AUTH_SERVICE',
+        ...OPTIONS,
+      },
+    ])
   ],
   controllers: [AuthController],
   providers: [AuthService],
