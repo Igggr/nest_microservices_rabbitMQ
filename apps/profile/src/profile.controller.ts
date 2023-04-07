@@ -8,7 +8,7 @@ import { firstValueFrom } from 'rxjs';
 import { Profile } from './entities/profile-entity';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
-@Controller()
+@Controller('/profile')
 export class ProfileController {
   constructor(
     private readonly profileService: ProfileService,
@@ -24,8 +24,6 @@ export class ProfileController {
 
   @Post('/login')
   async login(@Body() dto: LoginDTO) {
-    const resp = await firstValueFrom(this.client.send(LOGIN, dto));
-    console.log(resp);
-    return 'sent'
+    return this.profileService.logn(dto);
   }
 }

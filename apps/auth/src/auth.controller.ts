@@ -24,9 +24,6 @@ export class AuthController {
     @Payload() data: LoginDTO,
     @Ctx() context: RmqContext,
   ) {
-    console.log('login ....');
-    console.log(data);
-
-    return { token: 'jhgujjhgybgfys'}
+    return this.authService.login(data);
   }
 }

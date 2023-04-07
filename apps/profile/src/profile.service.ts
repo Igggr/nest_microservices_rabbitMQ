@@ -4,7 +4,7 @@ import { Repository } from 'typeorm'
 import { Profile } from './entities/profile-entity';
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateProfileDTO } from './dto/create-profile.dto';
-import { CREATE_USER } from '@app/common';
+import { CREATE_USER, LOGIN, LoginDTO } from '@app/common';
 import { firstValueFrom } from 'rxjs';
 
 
@@ -27,6 +27,11 @@ export class ProfileService {
     const profile = await this.profileRepository.create({ name: dto.name, surname: dto.surname, phone: dto.phone, userId });
     console.log(profile);
     return await this.profileRepository.save(profile);
+  }
+
+  async logn(dto: LoginDTO) {
+    const token = await firstValueFrom(this.client.send(LOGIN, dto));
+    return { token };
   }
 
 }
