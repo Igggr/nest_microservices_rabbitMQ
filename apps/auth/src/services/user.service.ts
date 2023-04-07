@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Equal, Repository } from 'typeorm';
 import { User } from '../entities/user-entity';
 import { CreateUserDTO, USER } from '@app/common';
-import { RolesService } from './role.service';
+import { RoleService } from './role.service';
 import { UserRole } from '../entities/user-roie-entity';
 import { Role } from '../entities/role-entity';
 import { RpcException } from '@nestjs/microservices';
@@ -16,8 +16,7 @@ export class UserService {
         private readonly userRepository: Repository<User>,
         @InjectRepository(UserRole)
         private readonly userRoleRepository: Repository<UserRole>,
-        private readonly roleService: RolesService,
-        private readonly dataSource: DataSource,
+        private readonly roleService: RoleService,
     ) { }
 
     async hasUserWithEmail(email: string): Promise<boolean> {

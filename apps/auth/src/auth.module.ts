@@ -10,7 +10,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { UserService } from './services/user.service';
-import { RolesService } from './services/role.service';
+import { RoleService } from './services/role.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 
 @Module({
@@ -50,7 +50,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
   providers: [
     AuthService,
     UserService,
-    RolesService,
+    RoleService,
   ],
 })
 export class AuthModule {}

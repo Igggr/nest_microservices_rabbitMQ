@@ -8,7 +8,7 @@ import { RpcException } from '@nestjs/microservices';
 
 
 @Injectable()
-export class RolesService {
+export class RoleService {
     constructor(
         @InjectRepository(Role)
         private readonly roleRepository: Repository<Role>,
