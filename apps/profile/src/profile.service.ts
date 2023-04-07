@@ -23,9 +23,7 @@ export class ProfileService {
   async create(dto: CreateProfileDTO) {
     const payload = { email: dto.email, password: dto.password, login: dto.login };
     const userId = await firstValueFrom(this.client.send(CREATE_USER, payload));
-    console.log(userId)
     const profile = await this.profileRepository.create({ name: dto.name, surname: dto.surname, phone: dto.phone, userId });
-    console.log(profile);
     return await this.profileRepository.save(profile);
   }
 
