@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Equal, Repository } from 'typeorm';
 import { User } from '../entities/user-entity';
@@ -6,6 +6,7 @@ import { CreateUserDTO, USER } from '@app/common';
 import { RolesService } from './role.service';
 import { UserRole } from '../entities/user-roie-entity';
 import { Role } from '../entities/role-entity';
+import { RpcException } from '@nestjs/microservices';
 
 
 @Injectable()
@@ -40,7 +41,7 @@ export class UserService {
 
     async create(dto: CreateUserDTO): Promise<number> {
         if (await this.hasUserWithEmail(dto.email)) {
-            throw new HttpException(`Пользователь с email ${dto.email} уже существует`, HttpStatus.CONFLICT)
+            throw new RpcException(`Пользователь с email ${dto.email} уже существует`)
         }
         const user = this.userRepository.create({ login: dto.login, email: dto.email });
         await user.setPassword(dto.password);

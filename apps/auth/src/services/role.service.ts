@@ -1,12 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Equal } from 'typeorm';
 import { Role } from '../entities/role-entity';
-import { UserRole } from '../entities/user-roie-entity';
-import { User } from '../entities/user-entity';
-import { UserService } from './user.service';
 import { CreateRoleDTO } from '../dto/create-role.dto';
 import { USER } from '@app/common';
+import { RpcException } from '@nestjs/microservices';
 
 
 @Injectable()
@@ -19,7 +17,7 @@ export class RolesService {
     async create(dto: CreateRoleDTO) {
         const role = await this.findRoleByValue(dto.value);
         if (role) {
-            throw new HttpException(`Роль c value = ${role.value} уже существует`, HttpStatus.CONFLICT)
+            throw new RpcException(`Роль c value = ${role.value} уже существует`)
         }
         const newRole = this.roleRepository.create(dto);
         return await this.roleRepository.save(newRole);
