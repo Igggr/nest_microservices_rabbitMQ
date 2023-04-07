@@ -7,7 +7,4 @@ export class AuthService {
     @Inject('AUTH_SERVICE') private readonly client: ClientProxy
   ) { }
   
-  getHello(): string {
-    return 'Hello World!';
-  }
 }

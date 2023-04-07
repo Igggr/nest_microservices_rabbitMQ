@@ -1,12 +1,14 @@
-import { Controller, Get } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { Controller } from '@nestjs/common';
+import { AuthService } from './services/auth.service';
 import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
 import { CREATE_USER, CreateUserDTO, LOGIN, LoginDTO } from '@app/common';
+import { UserService } from './services/user.service';
 
 @Controller()
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
+    private readonly userService: UserService,
   ) { }
 
   @MessagePattern(CREATE_USER)
@@ -14,10 +16,7 @@ export class AuthController {
     @Payload() dto: CreateUserDTO,
     @Ctx() context: RmqContext,
   ) {
-    console.log('creating ')
-    console.log(dto);
-
-    return "I'm id"
+    return this.userService.create(dto);
   }
 
   @MessagePattern(LOGIN)

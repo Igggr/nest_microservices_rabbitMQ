@@ -17,7 +17,7 @@ export class DatabaseModule {
             password: configService.get<string>('DB_PASSWORD'),
             database: configService.get<string>('DB_NAME'),
             entities,
-            synchronize: configService.get('NODE_ENV') !== 'prod'
+            synchronize: configService.get('NODE_ENV') !== 'prod' || true
           }),
           inject: [ConfigService]
         }),

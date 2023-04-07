@@ -31,12 +31,11 @@ export class Profile {
     @ApiProperty({ description: 'Телефон пользователя', example: '+79510032345' })
     @Column({ type: String })
     phone: string;
-
-
-    @Column(() => Number)
+    
+    @Type(() => Number)
     @IsInt()
-    @ApiProperty({ description: 'Id User, связанного с аккаунтом', example: '1' })
     @IsPositive()
+    @ApiProperty({ description: 'Id User, связанного с аккаунтом', example: '1' })
+    @Column({ type: Number })
     userId: number;
-
 } 

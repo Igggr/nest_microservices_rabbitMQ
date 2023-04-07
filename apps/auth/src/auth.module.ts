@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { AuthService } from './services/auth.service';
 import { DatabaseModule, OPTIONS } from '@app/common';
 import { User } from './entities/user-entity';
 import { Role } from './entities/role-entity';
@@ -9,6 +9,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { UserService } from './services/user.service';
+import { RolesService } from './services/role.service';
 
 @Module({
   imports: [
@@ -34,6 +36,10 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     ])
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [
+    AuthService,
+    UserService,
+    RolesService,
+  ],
 })
 export class AuthModule {}

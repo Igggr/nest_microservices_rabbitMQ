@@ -23,7 +23,6 @@ export class UserRole {
         () => User,
         (user) => user.userRoles,
         {
-            cascade: true,
             onDelete: 'CASCADE',
         }
     )
@@ -37,7 +36,6 @@ export class UserRole {
         (role) => role.userRoles,
         {
             eager: true,
-            cascade: true,
             onDelete: 'CASCADE',
         }
     )
@@ -53,7 +51,6 @@ export class UserRole {
         () => User,
         (user) => user.creatures,
         {
-            cascade: true,
             onDelete: 'SET NULL',
         }
     )
