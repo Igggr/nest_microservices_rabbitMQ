@@ -50,10 +50,12 @@ export class ProfileController {
   @UseGuards(SameUserOrHasRoleGuard)
   @Delete('/:id')
   delete(
-    @Param('id', ParseIntPipe) id: number
+     // Может должно быть profile.id, а не user.id? Удаляются в принципе оба
+     // Сделал на user.id. потому что все guard работают с объектом, возвращаемым auth модулем
+    // а он возвращает user (c user.id)
+    @Param('id', ParseIntPipe) userId: number  
   ) {
-    console.log('Deleting user');
-
+    return this.profileService.delete(userId);
   }
 
 }
