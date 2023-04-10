@@ -1,13 +1,14 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMapping, RequestMethod } from '@nestjs/common';
 import { ProfileController } from './profile.controller';
 import { ProfileService } from './profile.service';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 
-import { DatabaseModule, OPTIONS } from '@app/common';
+import { AUTH_SERVICE, DatabaseModule, OPTIONS } from '@app/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Profile } from './entities/profile-entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { JwtMiddleware } from '@app/common';
 
 
 @Module({
@@ -28,7 +29,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     TypeOrmModule.forFeature([Profile]),
     ClientsModule.register([
       {
-        name: 'AUTH_SERVICE',
+        name: AUTH_SERVICE,
         ...OPTIONS,
       },
     ])
@@ -36,4 +37,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
   controllers: [ProfileController],
   providers: [ProfileService],
 })
-export class ProfileModule {}
+export class ProfileModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(JwtMiddleware).forRoutes(ProfileController)
+  }
+}

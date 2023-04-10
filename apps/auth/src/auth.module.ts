@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './services/auth.service';
-import { DatabaseModule, JWT_SECRET, OPTIONS } from '@app/common';
+import { AUTH_SERVICE, DatabaseModule, JWT_SECRET, OPTIONS } from '@app/common';
 import { User } from './entities/user-entity';
 import { Role } from './entities/role-entity';
 import { UserRole } from './entities/user-roie-entity';
@@ -31,14 +31,14 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
     TypeOrmModule.forFeature([User, UserRole, Role]),
     ClientsModule.register([
       {
-        name: 'AUTH_SERVICE',
+        name: AUTH_SERVICE,
         ...OPTIONS,
       },
     ]),
     JwtModule.registerAsync({
       useFactory: ((configService: ConfigService) => ({
           secret: configService.get(JWT_SECRET),
-            signOptions: {
+          signOptions: {
             expiresIn: '24h'
           }
         })

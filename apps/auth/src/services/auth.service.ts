@@ -3,13 +3,15 @@ import { ClientProxy } from '@nestjs/microservices';
 import { UserService } from './user.service';
 import { User } from '../entities/user-entity';
 import { JwtService } from '@nestjs/jwt';
-import { LoginDTO } from '@app/common';
+import { JWT_SECRET, LoginDTO } from '@app/common';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwt: JwtService,
     private readonly userService: UserService,
+    private readonly configService: ConfigService,
   ) { }
 
   async login(dto: LoginDTO) {
@@ -21,6 +23,7 @@ export class AuthService {
   private async generateToken(user: User) {
     const roles = await this.userService.getRoles(user);
     const payload = { email: user.email, id: user.id, roles };
+    
     const token = this.jwt.sign(payload);
     return token;
   }
@@ -35,6 +38,14 @@ export class AuthService {
     } catch (e) {
       throw new UnauthorizedException({ message: 'Авторизация не удалась' });
     }
+  }
+
+  verifyToken(token: string) {
+    const secret = this.configService.get(JWT_SECRET);
+    console.log(secret);
+    const user1 = this.jwt.verify(token);
+    const user = this.jwt.verify(token, { secret });
+    return user;
   }
   
 }
