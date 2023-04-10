@@ -7,6 +7,7 @@ import { RoleService } from './role.service';
 import { UserRole } from '../entities/user-roie-entity';
 import { Role } from '../entities/role-entity';
 import { RpcException } from '@nestjs/microservices';
+import { UpdateUserDTO } from '../dto/update-user.dto';
 
 
 @Injectable()
@@ -51,6 +52,16 @@ export class UserService {
         await this.assignRoleToUser(user, role);
         
         return user.id;
+    }
+
+    async update(dto: UpdateUserDTO) {
+        const user = await this.findById(dto.id);
+        user.login = dto.login ?? user.login;
+        user.email = dto.email ?? user.email;
+        if (dto.password) {
+            user.setPassword(dto.password);
+        }
+        await this, this.userRepository.save(user);
     }
 
     async delete(id: number) {

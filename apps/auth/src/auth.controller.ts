@@ -1,8 +1,9 @@
 import { Controller } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
 import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
-import { CREATE_USER, CreateUserDTO, DELETE_USER, LOGIN, LoginDTO, VALIDATE_USER } from '@app/common';
+import { CREATE_USER, CreateUserDTO, DELETE_USER, LOGIN, LoginDTO, UPDATE_USER, VALIDATE_USER } from '@app/common';
 import { UserService } from './services/user.service';
+import { UpdateUserDTO } from './dto/update-user.dto';
 
 @Controller()
 export class AuthController {
@@ -42,5 +43,12 @@ export class AuthController {
     @Payload() id: number,
   ) {
     this.userService.delete(id);
+  }
+
+  @EventPattern(UPDATE_USER)
+  update(
+    @Payload() dto: UpdateUserDTO,
+  ) {
+    this.userService.update(dto);
   }
 }

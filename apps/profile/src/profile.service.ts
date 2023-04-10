@@ -4,8 +4,9 @@ import { Equal, Repository } from 'typeorm'
 import { Profile } from './entities/profile-entity';
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateProfileDTO } from './dto/create-profile.dto';
-import { CREATE_USER, DELETE_USER, LOGIN, LoginDTO } from '@app/common';
+import { CREATE_USER, DELETE_USER, LOGIN, LoginDTO, UPDATE_USER } from '@app/common';
 import { firstValueFrom } from 'rxjs';
+import { UpdateProfileDTO } from './dto/update-profile-dto';
 
 
 @Injectable()
@@ -40,10 +41,30 @@ export class ProfileService {
     return user;
   }
 
+  async findAll() {
+    return this.profileRepository.find();
+  }
+
+  async update(userId: number, dto: UpdateProfileDTO) {
+    if (dto.email || dto.login || dto.password) {  // храниться в таблице user
+      // ждать пока user обновится не надо
+      this.client.emit(UPDATE_USER, { email: dto.email, login: dto.login, password: dto.password, id: userId });
+    }
+
+    const profile = await this.findByUserId(userId);
+    if (dto.name || dto.surname || dto.phone) { // хранится в таблице profile   
+      profile.name = dto.name ?? profile.name;
+      profile.surname = dto.surname ?? profile.surname;
+      profile.phone = dto.phone ?? profile.phone;
+      return this.profileRepository.save(profile);
+    }
+    return profile;
+  }
+
   async delete(id: number) {
     const profile = await this.findByUserId(id);
     if (profile) {
-      console.log()
+      // ждать пока user удалится не надо
       this.client.emit(DELETE_USER, id);
       return await this.profileRepository.remove(profile);
     } else {
