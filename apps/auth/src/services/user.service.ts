@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Equal, Repository } from 'typeorm';
 import { User } from '../entities/user-entity';
-import { CreateUserDTO, USER } from '@app/common';
+import { CreateUserDTO, ResponseDTO, USER } from '@app/common';
 import { RoleService } from './role.service';
 import { UserRole } from '../entities/user-roie-entity';
 import { Role } from '../entities/role-entity';
@@ -39,9 +39,12 @@ export class UserService {
         return await this.userRepository.find();
     }
 
-    async create(dto: CreateUserDTO): Promise<number> {
+    async create(dto: CreateUserDTO): Promise<ResponseDTO<number>> {
         if (await this.hasUserWithEmail(dto.email)) {
-            throw new RpcException(`Пользователь с email ${dto.email} уже существует`)
+            return {
+                status: 'error',
+                error: `Пользователь с email ${dto.email} уже существует`,
+            }
         }
         const user = this.userRepository.create({ login: dto.login, email: dto.email });
         await user.setPassword(dto.password);
@@ -51,7 +54,10 @@ export class UserService {
         const role = await this.roleService.ensureHas(USER);
         await this.assignRoleToUser(user, role);
         
-        return user.id;
+        return {
+            status: 'ok',
+            value: user.id,
+        }
     }
 
     async update(dto: UpdateUserDTO) {

@@ -3,8 +3,9 @@ import { ClientProxy } from '@nestjs/microservices';
 import { UserService } from './user.service';
 import { User } from '../entities/user-entity';
 import { JwtService } from '@nestjs/jwt';
-import { JWT_SECRET, LoginDTO } from '@app/common';
+import { AUTH_ERROR, INCORRECT_EMAIL_OR_PASSWORD, JWT_SECRET, LoginDTO } from '@app/common';
 import { ConfigService } from '@nestjs/config';
+import { ResponseDTO } from '@app/common/dto/response-dto';
 
 @Injectable()
 export class AuthService {
@@ -14,10 +15,21 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) { }
 
-  async login(dto: LoginDTO) {
-    const user = await this.validateUser(dto);
-    const token = await this.generateToken(user);
-    return token;
+  async login(dto: LoginDTO): Promise<ResponseDTO<string>> {
+    try {
+      const user = await this.validateUser(dto);
+      const token = await this.generateToken(user);
+      return {
+        status: 'ok',
+        value: token
+      };
+    } catch (e) {
+      return {
+        status: 'error',
+        error: e.message
+      }
+    }
+   
   }
 
   private async generateToken(user: User) {
@@ -29,15 +41,11 @@ export class AuthService {
   }
 
   private async validateUser(dto: LoginDTO) {
-    try {
-      const user = await this.userService.findByEmail(dto.email);
-      if (user && await user.checkPassword(dto.password)) {
-        return user;
-      }
-      throw new UnauthorizedException({ message: 'Некорректный емайл или пароль' });
-    } catch (e) {
-      throw new UnauthorizedException({ message: 'Авторизация не удалась' });
+    const user = await this.userService.findByEmail(dto.email);
+    if (user && await user.checkPassword(dto.password)) {
+      return user;
     }
+    throw new UnauthorizedException({ message: INCORRECT_EMAIL_OR_PASSWORD });
   }
 
   verifyToken(token: string) {

@@ -4,7 +4,7 @@ import { Equal, Repository } from 'typeorm'
 import { Profile } from './entities/profile-entity';
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateProfileDTO } from './dto/create-profile.dto';
-import { CREATE_USER, DELETE_USER, LOGIN, LoginDTO, UPDATE_USER } from '@app/common';
+import { AUTH_SERVICE, CREATE_USER, DELETE_USER, LOGIN, LoginDTO, UPDATE_USER, ResponseDTO } from '@app/common';
 import { firstValueFrom } from 'rxjs';
 import { UpdateProfileDTO } from './dto/update-profile-dto';
 
@@ -14,7 +14,7 @@ export class ProfileService {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
-    @Inject('AUTH_SERVICE')
+    @Inject(AUTH_SERVICE)
     private readonly client: ClientProxy,
   ) { }
 
@@ -22,17 +22,24 @@ export class ProfileService {
   // жди ответа, получив userId - используй его при создаиии профиля
   async create(dto: CreateProfileDTO) {
     const payload = { email: dto.email, password: dto.password, login: dto.login };
-    const userId = await firstValueFrom(this.client.send(CREATE_USER, payload));
-    const profile = await this.profileRepository.create({ name: dto.name, surname: dto.surname, phone: dto.phone, userId });
+    const response: ResponseDTO<number> = await firstValueFrom(this.client.send(CREATE_USER, payload));
+    if (response.status === 'error') {
+      throw new HttpException(response.error, HttpStatus.BAD_REQUEST);
+    }
+    
+    const profile = await this.profileRepository.create({ name: dto.name, surname: dto.surname, phone: dto.phone, userId: response.value });
     return await this.profileRepository.save(profile);
   }
 
-  async logn(dto: LoginDTO) {
-    const token = await firstValueFrom(this.client.send(LOGIN, dto));
-    return { token };
+  async login(dto: LoginDTO): Promise<ResponseDTO<string>> {
+    const response: ResponseDTO<string> = await firstValueFrom(this.client.send(LOGIN, dto));
+    if (response.status === 'error') {
+      throw new HttpException(response.error, HttpStatus.FORBIDDEN)
+    }
+    return response;
   }
 
-  async findByUserId(userId: number) {
+  private async findByUserId(userId: number) {
     const user = await this.profileRepository.findOne({
       where: {
         userId: Equal(userId)
@@ -43,6 +50,14 @@ export class ProfileService {
 
   async findAll() {
     return this.profileRepository.find();
+  }
+
+  async findOne(userid: number) {
+    const user = await this.findByUserId(userid);
+    if (user) {
+      return user;
+    }
+    throw new HttpException(`Не существует пользователя с id = ${userid}`, HttpStatus.BAD_REQUEST); 
   }
 
   async update(userId: number, dto: UpdateProfileDTO) {
