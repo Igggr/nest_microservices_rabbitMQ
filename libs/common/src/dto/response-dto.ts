@@ -39,10 +39,8 @@ export class ForbidenResponse {
 
 export const SWAGGER_FORBIDDEN_RESPONSE = { status: HttpStatus.FORBIDDEN, type: ForbidenResponse };
 
-export class HttpExceptionDTO {
-    @ApiResponseProperty()
-    statusCode: number;
-    
-    @ApiResponseProperty()
-    message: string;
-}
+export const SWAGGER_USER_ID_PARAM = {
+    name: 'userId',
+    description: 'Id пользователя, должно существовать в БД. Соответсвует user.id (profile.userId), а не его profile.id',
+    example: 1,
+};
