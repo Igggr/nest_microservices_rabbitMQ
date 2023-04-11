@@ -11,7 +11,7 @@ export class DatabaseModule {
         TypeOrmModule.forRootAsync({
           useFactory: (configService: ConfigService) => ({
             type: 'postgres',
-            host: 'postgres', //configService.get<string>('DB_HOST'),
+            host: configService.get<string>('DB_HOST'),
             port: +configService.get('DB_PORT'),
             username: configService.get<string>('DB_USER'),
             password: configService.get<string>('DB_PASSWORD'),
