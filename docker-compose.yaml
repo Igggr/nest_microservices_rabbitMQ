@@ -37,8 +37,50 @@ services:
       - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit disk_free_limit 2147483648
     volumes:
       - ./rabbitmq:/var/lib/rabbitmq
+    networks:
+      - rabbit
+
+  profile:
+    build:
+      context: .
+      dockerfile: ./apps/profile/Dockerfile
+      target: development
+    command: npm run start:dev profile
+    env_file:
+      - ./apps/profile/.env
+    depends_on:
+      - postgres
+      - rabbit
+      - auth
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3000:3000'
+    networks:
+      - postgres
+      - rabbit
+
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    command: npm run start:dev auth
+    env_file:
+      - ./apps/auth/.env
+    depends_on:
+      - postgres
+      - rabbit
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - postgres
+      - rabbit
 
 networks:
   postgres:
     driver: bridge
-  
+  rabbit:
+    driver: bridge
