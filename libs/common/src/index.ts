@@ -7,3 +7,5 @@ export * from './constants';
 export * from './auth/jwt-middleware';
 export * from './auth/guards';
 export * from './errors';
+export * from './test_helper/mock-repository';
+export * from './test_helper/mock-client';

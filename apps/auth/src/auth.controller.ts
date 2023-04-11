@@ -23,7 +23,6 @@ export class AuthController {
   @MessagePattern(LOGIN)
   login(
     @Payload() data: LoginDTO,
-    @Ctx() context: RmqContext,
   ) {
     return this.authService.login(data);
   }
@@ -31,7 +30,6 @@ export class AuthController {
   @MessagePattern(VALIDATE_USER)
   validateUser(
     @Payload() auth: { token: string },
-    @Ctx() context: RmqContext,
   ) {
     return this.authService.verifyToken(auth.token);
   }
