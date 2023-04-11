@@ -14,7 +14,7 @@ export class SameUserOrHasRoleGuard extends HasRoleGuard {
     }
 
     sameUser(req, user): boolean {
-        const userId = +req.params.id;
+        const userId = +req.params.userId;
         if (user.id === userId) {
             console.log('Тот же юзер')
             return true;

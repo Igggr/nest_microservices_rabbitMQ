@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Equal, Repository } from 'typeorm';
+import { Equal, Repository } from 'typeorm';
 import { User } from '../entities/user-entity';
 import { CreateUserDTO, ResponseDTO, USER } from '@app/common';
 import { RoleService } from './role.service';
 import { UserRole } from '../entities/user-roie-entity';
 import { Role } from '../entities/role-entity';
-import { RpcException } from '@nestjs/microservices';
 import { UpdateUserDTO } from '../dto/update-user.dto';
 
 
@@ -76,14 +75,14 @@ export class UserService {
         return res;
     }
 
-    async getRoles(user: User): Promise<string[]> {
-        const userRoles = (await this.userRepository.findOne(
+    async getRoles(id: number): Promise<string[]> {
+        const user = await this.userRepository.findOne(
             {
-                where: { id: Equal(user.id) },
+                where: { id: Equal(id) },
                 relations: { userRoles: true } // нужен еще один запрос в БДб чтобы добраться до ролей
-            })
-        ).userRoles;
-        const roles = userRoles?.map((ur) => ur.role.value) ?? [];
+            }
+        );
+        const roles = user?.userRoles?.map((ur) => ur.role.value) ?? [];
         return roles;
     }
 

@@ -1,11 +1,10 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from '../entities/user-entity';
 import { JwtService } from '@nestjs/jwt';
-import { AUTH_ERROR, INCORRECT_EMAIL_OR_PASSWORD, JWT_SECRET, LoginDTO } from '@app/common';
+import { INCORRECT_EMAIL_OR_PASSWORD, JWT_SECRET, LoginDTO } from '@app/common';
 import { ConfigService } from '@nestjs/config';
-import { ResponseDTO } from '@app/common/dto/response-dto';
+import { AuthDTO, ResponseDTO, ValueDTO } from '@app/common/dto/response-dto';
 
 @Injectable()
 export class AuthService {
@@ -33,9 +32,7 @@ export class AuthService {
   }
 
   private async generateToken(user: User) {
-    const roles = await this.userService.getRoles(user);
-    const payload = { email: user.email, id: user.id, roles };
-    
+    const payload = { email: user.email, id: user.id };    
     const token = this.jwt.sign(payload);
     return token;
   }
@@ -48,12 +45,35 @@ export class AuthService {
     throw new UnauthorizedException({ message: INCORRECT_EMAIL_OR_PASSWORD });
   }
 
-  verifyToken(token: string) {
-    const secret = this.configService.get(JWT_SECRET);
-    console.log(secret);
-    const user1 = this.jwt.verify(token);
-    const user = this.jwt.verify(token, { secret });
-    return user;
+  async verifyToken(token: string): Promise<ResponseDTO<AuthDTO>> {
+    try {
+      const secret = this.configService.get(JWT_SECRET);
+      const { id } = this.jwt.verify(token, { secret });
+      const user = await this.userService.findById(id);
+      if (!user) {
+        return {
+          status: 'error',
+          error: 'Пользователь, которому принадлежал этот токен был удален'
+        }
+      }
+      const roles = await this.userService.getRoles(id)
+
+      return {
+        status: 'ok',
+        value: {
+          id,
+          email: user.email,
+          login: user.login,
+          roles,
+        }
+      };
+
+    } catch (e) {
+      return {
+        status: 'error',
+        error: e.message
+      };
+    }
   }
   
 }

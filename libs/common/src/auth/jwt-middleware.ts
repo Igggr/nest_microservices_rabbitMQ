@@ -1,8 +1,9 @@
-import { Inject, Injectable, NestMiddleware } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable, NestMiddleware } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
-import { firstValueFrom, tap } from "rxjs";
+import { firstValueFrom, tap, throwError } from "rxjs";
 import { VALIDATE_USER } from "../rabbit/events";
 import { AUTH_SERVICE } from "../rabbit/names";
+import { AuthDTO, ResponseDTO } from "../dto";
 
 
 @Injectable()
@@ -21,12 +22,15 @@ export class JwtMiddleware implements NestMiddleware {
         const [bearer, token] = auth.split(' ');
         if (bearer === "Bearer" && token) {
     
-            const user = await firstValueFrom(
+            const response: ResponseDTO<AuthDTO> = await firstValueFrom(
                 this.authClient.send(VALIDATE_USER, { token, })
             );
-            console.log(user);
+            if (response.status === 'error') {
+                throw new HttpException(response.error, HttpStatus.FORBIDDEN)
+            }
+            console.log(response.value);
 
-            req.user = user;
+            req.user = response.value;
             next();
         }
     

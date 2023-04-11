@@ -39,6 +39,7 @@ export abstract class HasRoleGuard implements CanActivate {
     }
 
     check(req, user, requiredRoles: string[]): boolean {
+        console.log(`User has roles: ${user.roles}`);
         return user.roles.some(role => requiredRoles.includes(role));
     }
 }

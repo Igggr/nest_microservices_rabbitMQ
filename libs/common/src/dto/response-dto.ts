@@ -18,6 +18,13 @@ export class ValueDTO<V> {
     value: V;
 }
 
+export class AuthDTO {
+    id: number;
+    email: string;
+    login: string;
+    roles: string[];
+}
+
 export class TokenResponse extends ValueDTO<string> {
     @ApiProperty({
         description: 'jwt-токен',
