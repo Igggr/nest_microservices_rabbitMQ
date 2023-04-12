@@ -2,9 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { ProfileModule } from './profile.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import { MicroserviceOptions, RmqOptions, Transport } from '@nestjs/microservices';
-import { OPTIONS } from '@app/common';
-
 
 async function bootstrap() {
   const app = await NestFactory.create(ProfileModule);
@@ -16,7 +13,7 @@ async function bootstrap() {
     .addTag('v0')
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'jwt' },
-      'defaultBearerAuth'
+      'defaultBearerAuth',
     )
     .build();
 

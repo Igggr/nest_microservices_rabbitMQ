@@ -8,10 +8,10 @@ import { UserRole } from './entities/user-roie-entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ClientsModule } from '@nestjs/microservices';
 import { UserService } from './services/user.service';
 import { RoleService } from './services/role.service';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -24,8 +24,8 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
         DB_USER: Joi.string().required(),
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
-        JWT_SECRET: Joi.string().required()
-      })
+        JWT_SECRET: Joi.string().required(),
+      }),
     }),
     DatabaseModule.forRoot([User, UserRole, Role]),
     TypeOrmModule.forFeature([User, UserRole, Role]),
@@ -36,21 +36,16 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
       },
     ]),
     JwtModule.registerAsync({
-      useFactory: ((configService: ConfigService) => ({
-          secret: configService.get(JWT_SECRET),
-          signOptions: {
-            expiresIn: '24h'
-          }
-        })
-      ),
-      inject: [ConfigService]
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get(JWT_SECRET),
+        signOptions: {
+          expiresIn: '24h',
+        },
+      }),
+      inject: [ConfigService],
     }),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    UserService,
-    RoleService,
-  ],
+  providers: [AuthService, UserService, RoleService],
 })
 export class AuthModule {}

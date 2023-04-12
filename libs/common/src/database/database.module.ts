@@ -17,11 +17,11 @@ export class DatabaseModule {
             password: configService.get<string>('DB_PASSWORD'),
             database: configService.get<string>('DB_NAME'),
             entities,
-            synchronize: configService.get('NODE_ENV') !== 'prod' || true
+            synchronize: configService.get('NODE_ENV') !== 'prod' || true,
           }),
-          inject: [ConfigService]
+          inject: [ConfigService],
         }),
-      ]
-    }
+      ],
+    };
   }
 }

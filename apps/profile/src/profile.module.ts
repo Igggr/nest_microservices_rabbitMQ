@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMapping, RequestMethod } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ProfileController } from './profile.controller';
 import { ProfileService } from './profile.service';
 import { ConfigModule } from '@nestjs/config';
@@ -7,9 +7,8 @@ import * as Joi from 'joi';
 import { AUTH_SERVICE, DatabaseModule, OPTIONS } from '@app/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Profile } from './entities/profile-entity';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ClientsModule } from '@nestjs/microservices';
 import { JwtMiddleware } from '@app/common';
-
 
 @Module({
   imports: [
@@ -23,22 +22,22 @@ import { JwtMiddleware } from '@app/common';
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
         APP_PORT: Joi.number().required(),
-      })
+      }),
     }),
-    DatabaseModule.forRoot([Profile]) ,
+    DatabaseModule.forRoot([Profile]),
     TypeOrmModule.forFeature([Profile]),
     ClientsModule.register([
       {
         name: AUTH_SERVICE,
         ...OPTIONS,
       },
-    ])
+    ]),
   ],
   controllers: [ProfileController],
   providers: [ProfileService],
 })
 export class ProfileModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtMiddleware).forRoutes(ProfileController)
+    consumer.apply(JwtMiddleware).forRoutes(ProfileController);
   }
 }
